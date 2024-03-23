@@ -60,6 +60,7 @@ def get_cones(pts, max_distance):
 
 
 class PathManager:
+  BOUNDARY_DISTANCE = 1.5
   CTRL_POINT_RADIUS = 5
 
   def __init__(self, vm: ViewportManager):
@@ -72,6 +73,9 @@ class PathManager:
     self.dragging_ctrl_idx = None
     self.control_enabled = True
     self.__update_curve()
+
+  def get_centerline(self):
+    return get_cones(self.approx_pts, 2)
 
   def toggle_control(self):
     self.control_enabled = not self.control_enabled
@@ -89,7 +93,7 @@ class PathManager:
 
     self.approx_pts = [self.curve(t) for t in np.linspace(self.curve.start(0), self.curve.end(0), precision)]
 
-    gen = [(self.curve(t), 1.5 * get_normal_vector2(self.curve.tangent(t))) for t in np.linspace(self.curve.start(0), self.curve.end(0), precision)]
+    gen = [(self.curve(t), self.BOUNDARY_DISTANCE  * get_normal_vector2(self.curve.tangent(t))) for t in np.linspace(self.curve.start(0), self.curve.end(0), precision)]
     self.right_wall = [ pos + norm for pos, norm in gen ]
     self.left_wall = [ pos - norm for pos, norm in gen ]
 
